@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <fileioc.h>
 #include <keypadc.h>
-#include "help.cpp"
+#include "help.c"
 
 void PrintCentered(const char *str,int height);
 void Border(int drawTaskbar, int drawTips);
