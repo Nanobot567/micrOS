@@ -4,15 +4,16 @@
 #include <fileioc.h>
 #include <keypadc.h>
 #include "help.c"
+#include "settings.c"
+#include "fn.c"
 
-void PrintCentered(const char *str,int height);
-void Border(int drawTaskbar, int drawTips);
-uint8_t getKeyPress(void);
 void fileList(void);
+void menu(void);
 
 uint8_t numFiles = 0;
 uint8_t numFilesShown = 0;
-uint8_t selectedNum = 1;
+int selectedNum = 1;
+char * prgmName;
 
 /* Screen height: 240. Length: 320. When printing, the height goes from the top down.*/
 
@@ -27,54 +28,58 @@ int main(void)
     gfx_ZeroScreen();
     Border(0,0);
 
-    gfx_SetTextFGColor(160);
+    gfx_SetTextFGColor(224);
     gfx_SetTextScale(2,2);
     PrintCentered("micrOS",100);
     gfx_SetTextScale(1,1);
-    PrintCentered("v1.0dev. press any key to continue.",125);
+    PrintCentered("v1.1dev. press any key to continue.",125);
+    PrintCentered("for help, press [y=] and navigate to help",200);
 
     while (!os_GetCSC());
 
     fileList();
+    
 
     while (1==1) {
-        if ((kb_IsDown(kb_KeyDown)) && (selectedNum < numFilesShown)) {
+        if ((kb_IsDown(kb_KeyUp)) && ((selectedNum <= numFilesShown) && (selectedNum != 1))) {
             gfx_SetTextFGColor(0);
-            gfx_PrintStringXY(">",22,5+(selectedNum*15));
-            selectedNum++;
-            gfx_SetTextFGColor(160);
-            gfx_PrintStringXY(">",22,5+(selectedNum*15));
-            delay(80);
-        } else if ((kb_IsDown(kb_KeyUp)) && ((selectedNum != numFilesShown))) {
-            gfx_SetTextFGColor(0);
-            gfx_PrintStringXY(">",22,5+(selectedNum*15));
+            gfx_PrintStringXY(">",20,5+(selectedNum*15));
             selectedNum--;
-            gfx_SetTextFGColor(160);
-            gfx_PrintStringXY(">",22,5+(selectedNum*15));
-            delay(80);
+            gfx_SetTextFGColor(224);
+            gfx_PrintStringXY(">",20,5+(selectedNum*15));
+            delay(95);
+        } else if ((kb_IsDown(kb_KeyDown)) && (selectedNum < numFilesShown)) {
+            gfx_SetTextFGColor(0);
+            gfx_PrintStringXY(">",20,5+(selectedNum*15));
+            selectedNum++;
+            gfx_SetTextFGColor(224);
+            gfx_PrintStringXY(">",20,5+(selectedNum*15));
+            delay(95);
         } else if ((kb_IsDown(kb_Yequ))) {
-            gfx_ZeroScreen();
-            Border(1,0);
-            selectedNum = 1;
-            gfx_SetTextScale(2,2);
-            PrintCentered("micrOS",30);
-            gfx_SetTextScale(1,1);
-            PrintCentered("by nanobot567",50);
-            PrintCentered("special thanks to...",80);
-            PrintCentered("everyone in the CEMETECH community",95);
-            PrintCentered("0x298,0x2a3,0x2aa,0x2a6,0x257,",125);
-            PrintCentered("0x2ab,0x29f,0x2af,0x257,",140);
-            PrintCentered("0x2a4,0x298,0x2ab,0x29c,",155);
-            PrintCentered("0x2a6,0x257,0x2a3,0x2a6,0x2a3",170);
-            
-            gfx_PrintStringXY("1.0dev (do not distribute!)",16,204);
-            delay(1000);
-            while (!os_GetCSC());
+            menu();
             fileList();
-        } else if ((kb_IsDown(kb_Enter))) {
-            // nothing
+            Border(1,1);
+        // } else if ((kb_IsDown(kb_Graph)) && !((kb_IsDown(kb_KeyDown)))) {
+        //     gfx_ZeroScreen();
+        //     Border(1,0);
+        //     selectedNum = 1;
+        //     getHelp();
+        //     fileList();
+        } else if ((kb_IsDown(kb_2nd))) {
+            delay(50);
+            // FILE EXECUTION!!!!!
+
+            // gfx_End();
+            // os_RunPrgm(array[selectedNum-1],NULL,16,NULL);
+            // gfx_Begin();
+            // gfx_ZeroScreen();
+            // Border(1,0);
+            // selectedNum = 1;
+            // fileList();
         } else if ((kb_IsDown(kb_Clear))) {
             break;
+        } else {
+            //
         }
     }
     
@@ -84,56 +89,68 @@ int main(void)
     return 0;
 }
 
-void PrintCentered(const char *str,int height) {
-    gfx_PrintStringXY(str,
-                      (LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
-                      height);
-}
+void menu(void) {
+    int selectedMenuItem = 1;
+    int maxMenuItems = 4;
 
-void Border(int drawTaskbar, int drawTips) {
-    gfx_SetColor(160);
-    gfx_HorizLine(0,5,LCD_WIDTH);
-    gfx_VertLine(5,0,LCD_HEIGHT);
-    gfx_HorizLine(0,235,LCD_WIDTH);
-    gfx_VertLine(315,0,LCD_HEIGHT);
-    if (drawTaskbar == 1) {
-        gfx_HorizLine(0,220,LCD_WIDTH);
-        gfx_PrintStringXY("micrOS",16,224);
-        gfx_VertLine(70,220,15);
-        // print time using rtc_Time
-    }
-    if (drawTips == 1) {
-        gfx_HorizLine(0,15,LCD_WIDTH);
-        gfx_VertLine(40,5,10);
-        gfx_VertLine(110,5,10);
-        gfx_VertLine(170,5,10);
-        gfx_PrintStringXY("name",61,6);
-        gfx_PrintStringXY("size",127,6);
-    }
-    gfx_SetColor(0);
-}
+    gfx_ZeroScreen();
+    Border(1,0);
+    gfx_PrintStringXY("settings",40,20);
+    gfx_PrintStringXY("help",40,35);
+    gfx_PrintStringXY("credits",40,50);
+    gfx_PrintStringXY("exit menu",40,65);
+    gfx_PrintStringXY(">",20,20);
 
-uint8_t getKeyPress(void) {
-    static uint8_t last_key;
-    uint8_t only_key = 0;
-    kb_Scan();
-    for (uint8_t key = 1, group = 7; group; --group) {
-        for (uint8_t mask = 1; mask; mask <<= 1, ++key) {
-            if (kb_Data[group] & mask) {
-                if (only_key) {
-                    last_key = 0;
-                    return 0;
-                } else {
-                    only_key = key;
-                }
+    while (1==1) {
+        if ((kb_IsDown(kb_KeyUp)) && ((selectedMenuItem <= maxMenuItems) && (selectedMenuItem != 1))) {
+            gfx_SetTextFGColor(0);
+            gfx_PrintStringXY(">",20,5+(selectedMenuItem*15));
+            gfx_HorizLine(108,20,52);
+            selectedMenuItem--;
+            gfx_SetTextFGColor(224);
+            gfx_PrintStringXY(">",20,5+(selectedMenuItem*15));
+            delay(95);
+        } else if ((kb_IsDown(kb_KeyDown)) && (selectedMenuItem < maxMenuItems)) {
+            gfx_SetTextFGColor(0);
+            gfx_PrintStringXY(">",20,5+(selectedMenuItem*15));
+            selectedMenuItem++;
+            gfx_SetTextFGColor(224);
+            gfx_PrintStringXY(">",20,5+(selectedMenuItem*15));
+            delay(95);
+        } else if ((kb_IsDown(kb_2nd))) {
+            if (selectedMenuItem == 1) {
+                settings();
+                gfx_ZeroScreen();
+                selectedMenuItem = 1;
+                selectedNum = 1;
+                break;
+            } else if (selectedMenuItem == 2) {
+                getHelp();
+                gfx_ZeroScreen();
+                selectedMenuItem = 1;
+                selectedNum = 1;
+                break;
+            } else if (selectedMenuItem == 3) {
+                credits();
+                gfx_ZeroScreen();
+                selectedMenuItem = 1;
+                selectedNum = 1;
+                break;
+            } else if (selectedMenuItem == 4) {
+                gfx_ZeroScreen();
+                selectedMenuItem = 1;
+                selectedNum = 1;
+                break;
+            } else {
+                gfx_ZeroScreen();
+                selectedMenuItem = 1;
+                selectedNum = 1;
+                break;
             }
+        } else {
+            //pass
         }
     }
-    if (only_key == last_key) {
-        return 0;
-    }
-    last_key = only_key;
-    return only_key;
 }
 
 void fileList(void) {
@@ -150,25 +167,33 @@ void fileList(void) {
 
     gfx_ZeroScreen();
     Border(1,1);
-    gfx_SetTextFGColor(160);
+    gfx_SetTextFGColor(224);
     gfx_SetTextXY(10,10);
 
     while (((fileName = ti_DetectAny(&searchPos, NULL, &type)) != NULL) && (numFilesShown<12)) {
         if (type == TI_PRGM_TYPE || type == TI_PPRGM_TYPE) {
+            if (*fileName == '!' || *fileName == '#' || *fileName == *"MICROS") { 
+                continue;
+            }
+            
             slot = ti_Open(fileName,"r");
             size = ti_GetSize(slot);
 
-            gfx_PrintStringXY(fileName,42,fileY);
-            gfx_SetTextXY(121,fileY);
+            gfx_PrintStringXY(fileName,40,fileY);
+            gfx_SetTextXY(114,fileY);
             gfx_PrintInt(size,5);
+
+            // array[numFiles] = fileName;
+            // gfx_PrintString(array[numFiles]);
 
             ti_Close(slot);
 
             numFiles++;
             numFilesShown++;
             fileY += 15;
+
         }
     }
 
-    gfx_PrintStringXY(">",22,20);
+    gfx_PrintStringXY(">",20,20);
 }

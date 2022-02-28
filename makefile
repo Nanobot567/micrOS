@@ -4,8 +4,8 @@
 
 NAME = MICROS
 ICON = icon.png
-DESCRIPTION = "micrOS v1.0a"
-COMPRESSED = NO
+DESCRIPTION = "micrOS v1.1d"
+COMPRESSED = YES
 ARCHIVED = NO
 
 CFLAGS = -Wall -Wextra -Oz
