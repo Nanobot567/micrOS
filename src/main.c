@@ -5,7 +5,6 @@
 #include <keypadc.h>
 #include "help.c"
 #include "settings.c"
-#include "fn.c"
 
 void fileList(void);
 void menu(void);
@@ -32,7 +31,7 @@ int main(void)
     gfx_SetTextScale(2,2);
     PrintCentered("micrOS",100);
     gfx_SetTextScale(1,1);
-    PrintCentered("v1.1dev. press any key to continue.",125);
+    PrintCentered("v1.1.1dev. press any key to continue.",125);
     PrintCentered("for help, press [y=] and navigate to help",200);
 
     while (!os_GetCSC());
@@ -131,7 +130,7 @@ void menu(void) {
                 selectedNum = 1;
                 break;
             } else if (selectedMenuItem == 3) {
-                credits();
+                microCredits();
                 gfx_ZeroScreen();
                 selectedMenuItem = 1;
                 selectedNum = 1;
@@ -172,7 +171,7 @@ void fileList(void) {
 
     while (((fileName = ti_DetectAny(&searchPos, NULL, &type)) != NULL) && (numFilesShown<12)) {
         if (type == TI_PRGM_TYPE || type == TI_PPRGM_TYPE) {
-            if (*fileName == '!' || *fileName == '#' || *fileName == *"MICROS") { 
+            if (*fileName == '!' || *fileName == '#') { 
                 continue;
             }
             

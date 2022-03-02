@@ -5,8 +5,7 @@
 #include <keypadc.h>
 #include "fn.c"
 
-void waitForNext(void);
-void zero(void);
+void getHelp(void);
 
 void getHelp(void) {
     zero();
@@ -24,22 +23,4 @@ void getHelp(void) {
     waitForNext();
     PrintCentered("-- page 2 --",50);
     waitForNext();
-}
-
-void zero(void) {
-    gfx_ZeroScreen();
-    gfx_SetColor(160);
-    gfx_HorizLine(0,5,LCD_WIDTH);
-    gfx_VertLine(5,0,LCD_HEIGHT);
-    gfx_HorizLine(0,235,LCD_WIDTH);
-    gfx_VertLine(315,0,LCD_HEIGHT);
-    gfx_HorizLine(0,220,LCD_WIDTH);
-    gfx_PrintStringXY("micrOS",16,224);
-    gfx_VertLine(70,220,15);
-    // print time using rtc_Time
-}
-void waitForNext(void) {
-    delay(150);
-    while (!os_GetCSC());
-    zero();
 }
